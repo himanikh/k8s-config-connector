@@ -15,6 +15,7 @@
 package v1alpha1
 
 import (
+	refs "github.com/GoogleCloudPlatform/k8s-config-connector/apis/refs/v1beta1"
 	"github.com/GoogleCloudPlatform/k8s-config-connector/pkg/apis/k8s/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -31,6 +32,64 @@ type MemorystoreInstanceSpec struct {
 	// Immutable.
 	// The MemorystoreInstance name. If not given, the metadata.name will be used.
 	ResourceID *string `json:"resourceID,omitempty"`
+
+	// +kubebuilder:validation:XValidation:rule="self == oldSelf",message="Parent field is immutable"
+	// Immutable.
+	// +required
+	Parent `json:",inline"`
+
+	// Optional. Labels to represent user-provided metadata.
+	Labels map[string]string `json:"labels,omitempty"`
+
+	// Optional. Number of replica nodes per shard. If omitted the default is 0
+	//  replicas.
+	ReplicaCount *int32 `json:"replicaCount,omitempty"`
+
+	// Optional. Immutable. Authorization mode of the instance.
+	AuthorizationMode *string `json:"authorizationMode,omitempty"`
+
+	// Optional. Immutable. In-transit encryption mode of the instance.
+	TransitEncryptionMode *string `json:"transitEncryptionMode,omitempty"`
+
+	// Optional. Number of shards for the instance.
+	ShardCount *int32 `fimmujson:"shardCount,omitempty"`
+
+	// Optional. Immutable. Machine type for individual nodes of the instance.
+	NodeType *string `json:"nodeType,omitempty"`
+
+	// Optional. Persistence configuration of the instance.
+	PersistenceConfig *PersistenceConfig `json:"persistenceConfig,omitempty"`
+
+	// Optional. Immutable. Engine version of the instance.
+	EngineVersion *string `json:"engineVersion,omitempty"`
+
+	// Optional. User-provided engine configurations for the instance.
+	EngineConfigs map[string]string `json:"engineConfigs,omitempty"`
+
+	// Optional. Immutable. Zone distribution configuration of the instance for
+	//  node allocatiteon.
+	ZoneDistributionConfig *ZoneDistributionConfig `json:"zoneDistributionConfig,omitempty"`
+
+	// Optional. If set to true deletion of the instance will fail.
+	DeletionProtectionEnabled *bool `json:"deletionProtectionEnabled,omitempty"`
+
+	// Required. Immutable. User inputs and resource details of the auto-created
+	//  PSC connections.
+	PscAutoConnections []PscAutoConnection `json:"pscAutoConnections,omitempty"`
+
+	// Optional. Endpoints for the instance.
+	Endpoints []Instance_InstanceEndpoint `json:"endpoints,omitempty"`
+
+	// Optional. The mode config for the instance.
+	Mode *string `json:"mode,omitempty"`
+}
+
+type Parent struct {
+	// +required
+	ProjectRef *refs.ProjectRef `json:"projectRef"`
+
+	// +required
+	Location string `json:"location"`
 }
 
 // MemorystoreInstanceStatus defines the config connector machine state of MemorystoreInstance
@@ -51,6 +110,57 @@ type MemorystoreInstanceStatus struct {
 
 // MemorystoreInstanceObservedState is the state of the MemorystoreInstance resource as most recently observed in GCP.
 type MemorystoreInstanceObservedState struct {
+	// Identifier. Unique name of the instance.
+	//  Format: projects/{project}/locations/{location}/instances/{instance}
+	Name *string `json:"name,omitempty"`
+
+	// Output only. Creation timestamp of the instance.
+	CreateTime *string `json:"createTime,omitempty"`
+
+	// Output only. Latest update timestamp of the instance.
+	UpdateTime *string `json:"updateTime,omitempty"`
+
+	// Optional. Labels to represent user-provided metadata.
+	Labels map[string]string `json:"labels,omitempty"`
+
+	// Output only. Current state of the instance.
+	State *string `json:"state,omitempty"`
+
+	// Output only. Additional information about the state of the instance.
+	StateInfo *Instance_StateInfo `json:"stateInfo,omitempty"`
+
+	// Output only. System assigned, unique identifier for the instance.
+	Uid *string `json:"uid,omitempty"`
+
+	// Optional. Immutable. Authorization mode of the instance.
+	AuthorizationMode *string `json:"authorizationMode,omitempty"`
+
+	// Optional. Immutable. In-transit encryption mode of the instance.
+	TransitEncryptionMode *string `json:"transitEncryptionMode,omitempty"`
+
+	// Output only. Endpoints clients can connect to the instance through.
+	//  Currently only one discovery endpoint is supported.
+	DiscoveryEndpoints []DiscoveryEndpoint `json:"discoveryEndpoints,omitempty"`
+
+	// Optional. Immutable. Machine type for individual nodes of the instance.
+	NodeType *string `json:"nodeType,omitempty"`
+
+	// Optional. Immutable. Engine version of the instance.
+	EngineVersion *string `json:"engineVersion,omitempty"`
+
+	// Output only. Configuration of individual nodes of the instance.
+	NodeConfig *NodeConfig `json:"nodeConfig,omitempty"`
+
+	// Optional. Immutable. Zone distribution configuration of the instance for
+	//  node allocation.
+	ZoneDistributionConfig *ZoneDistributionConfig `json:"zoneDistributionConfig,omitempty"`
+
+	// Required. Immutable. User inputs and resource details of the auto-created
+	//  PSC connections.
+	PscAutoConnections []PscAutoConnection `json:"pscAutoConnections,omitempty"`
+
+	// Optional. Endpoints for the instance.
+	Endpoints []Instance_InstanceEndpoint `json:"endpoints,omitempty"`
 }
 
 // +genclient
